@@ -1,6 +1,8 @@
 import streamlit as st
 from gtts import gTTS, lang
 from googletrans import Translator, LANGUAGES
+import cv2
+import numpy as np
 
 # ---------------------------------------------------------------------------------------------------------------
 # Page configuration
@@ -156,6 +158,47 @@ def text_to_audio(texte, langue):
 # Page content
 # ---------------------------------------------------------------------------------------------------------------
 
+st.write("### Record your sign language video:")
+
+col1, col2 = st.columns([1,1])
+
+with col1:
+    record_button_pressed = st.button("Record", key="record_button")
+
+with col2:
+    stop_button_pressed = st.button("Stop", key="stop_button")
+
+if record_button_pressed:
+
+    cap = cv2.VideoCapture(0)
+    frame_placeholder = st.empty()
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            st.write("Video Capture Ended")
+            break
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame_placeholder.image(frame,channels="RGB")
+        if cv2.waitKey(1) & 0xFF == ord("q") or stop_button_pressed:
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+
+    # img_file_buffer = st.camera_input("Take a picture")
+
+    # if img_file_buffer is not None:
+    #     bytes_data = img_file_buffer.getvalue()
+    #     cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+
+    #     st.write(type(cv2_img))
+
+    #     st.write(cv2_img.shape)
+
+st.write('<br>', unsafe_allow_html=True)
+
+st.write("### Translate your text:")
+
 texte = st.text_input("Type your text here :", "How are you ?")
 texte = texte.lower()
 
@@ -163,17 +206,19 @@ lang_detect = detect_lang(texte)
 # Recover the language name from the language code
 langue_detect = list_langues[lang_detect]
 
-st.write("### Your text is in " + langue_detect + ".")
-st.write('<br>', unsafe_allow_html=True)
+st.write("### Your text is in ")
+st.write(langue_detect)
 
 # Select the language to translate to (default: french)
+st.write('<br>', unsafe_allow_html=True)
 langue = st.selectbox("Select a language to translate to :", list(list_langues.values()), index=list(list_langues.values()).index('french'))
 # Recover the language code from the language name
 langue_code = list(list_langues.keys())[list(list_langues.values()).index(langue)]
 
 texte_traduit = translate_text(texte, langue_code)
 
-st.write("### Your text translated to " + langue + " is : " + texte_traduit)
+st.write("### Your text translated to " + langue + " is : ")
+st.write(texte_traduit)
 st.write('<br>', unsafe_allow_html=True)
 
 # Check if the selected language is supported by gTTS
