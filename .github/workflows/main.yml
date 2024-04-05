@@ -21,10 +21,10 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           # va dans le dossier signlingo, checkout le code, pull le code, kill l'application et run l'application en fond de tache
           script: |
-            pkill -f streamlit
             cd signlingo/SignLingo
             git checkout .
             git pull
+            pkill -f streamlit || true
             sleep 10
             cd app
             nohup streamlit run app.py &
