@@ -25,6 +25,7 @@ jobs:
             git checkout .
             git pull
             pkill -f streamlit
-            nohup streamlit run app.py &
+            cd app
+            streamlit run app.py &
 
             
