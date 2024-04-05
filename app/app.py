@@ -221,6 +221,7 @@ st.write("### Your text translated to " + langue + " is : ")
 st.write(texte_traduit)
 st.write('<br>', unsafe_allow_html=True)
 
+
 # Check if the selected language is supported by gTTS
 if langue_code in lang.tts_langs():
     st.write("### Your text translated to speech:")
