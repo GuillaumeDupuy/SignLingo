@@ -26,6 +26,7 @@ jobs:
             git pull
             pkill -f streamlit
             sleep 10
+            cd app
             nohup streamlit run app.py &
             sleep 10
 
