@@ -19,7 +19,7 @@ jobs:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}
-          # va dans le dossier signlingo, checkout le code, pull le code et run l'application en fond de tache
+          # active env python, va dans le dossier signlingo, checkout le code, pull le code, kill l'app et rerun l'app en fond de tache
           script: |
             source bin/activate
             cd signlingo/SignLingo
