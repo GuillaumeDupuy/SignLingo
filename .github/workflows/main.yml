@@ -25,7 +25,8 @@ jobs:
             git checkout .
             git pull
             cd app
-            nohup streamlit run app.py &
+            streamlit run app.py &
             sleep 10
+            ps aux | grep streamlit
 
             
