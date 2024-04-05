@@ -21,7 +21,7 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           # va dans le dossier signlingo, checkout le code, pull le code et run l'application en fond de tache
           script: |
-            source /bin/activate
+            source bin/activate
             cd signlingo/SignLingo
             git checkout .
             git pull
