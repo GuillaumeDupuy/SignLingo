@@ -26,6 +26,11 @@ jobs:
             git checkout .
             git pull
             cd app
+            PID=$(lsof -ti:8501 )
+            if [[ -n $PID ]]; then
+              echo "Killing Streamlit process on port 8501"
+              kill -9 $PID
+            fi
             nohup streamlit run app.py > /dev/null 2>&1 &
 
             
