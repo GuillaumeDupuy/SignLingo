@@ -10,7 +10,7 @@ After the prediction, the text is translated to the language of choice and print
 
 The model work this mediapipe, it allows us to recognizes hand signs and finger gestures with a simple MLP using the detected key points.
 
-![project.gif](./project.gif)
+![project.gif](./assets/project.gif)
 
 This repository contains the following contents.
 
@@ -57,7 +57,7 @@ Press "k" to enter the mode to save key points（displayed as 「MODE:Logging Ke
 If you press "0" to "9", the key points will be added to "model/keypoint_classifier/keypoint.csv" as shown below.
 1st column: Pressed number (used as class ID), 2nd and subsequent columns: Key point coordinates
 
-![keypoint.png](./keypoint.png)
+![keypoint.png](./assets/keypoint.png)
 
 #### 2.Model training
 
