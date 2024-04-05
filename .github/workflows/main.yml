@@ -26,6 +26,6 @@ jobs:
             git checkout .
             git pull
             cd app
-            nohup streamlit run app.py &
+            nohup streamlit run app.py > /dev/null 2>&1 &
 
             
