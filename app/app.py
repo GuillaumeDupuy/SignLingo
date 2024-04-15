@@ -4,6 +4,7 @@ from googletrans import Translator, LANGUAGES
 import cv2
 import numpy as np
 from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
+from PIL import Image
 
 # ---------------------------------------------------------------------------------------------------------------
 # Page configuration
@@ -162,9 +163,8 @@ def text_to_audio(texte, langue):
 st.write("### Record your sign language video:")
 
 RTC_CONFIGURATION = RTCConfiguration(
-    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+    {"iceServers": [{"urls": ["http://51.222.84.8:8501/"]}]}
 )
-
 
 class VideoProcessor:
     def recv(self, frame):
@@ -179,7 +179,6 @@ class VideoProcessor:
         bbox_img = np.array(results.render()[0])
 
         return av.VideoFrame.from_ndarray(bbox_img, format="bgr24")
-
 
 webrtc_ctx = webrtc_streamer(
     key="WYH",
