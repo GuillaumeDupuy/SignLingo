@@ -1,3 +1,0 @@
-[server]
-sslCertFile = 'certs/cert.pem'
-sslKeyFile = 'certs/key.pem'
