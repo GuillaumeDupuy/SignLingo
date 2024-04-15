@@ -1,3 +1,7 @@
 [server]
-sslCertFile = 'etc/ssl/certs/my.pem'
-sslKeyFile = 'etc/ssl/private/my.key'
+port = 8501
+headless = true
+[browser]
+serverAddress = "localhost"
+gatherUsageStats = false
+serverPort = 8501
