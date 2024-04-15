@@ -163,7 +163,7 @@ def text_to_audio(texte, langue):
 st.write("### Record your sign language video:")
 
 RTC_CONFIGURATION = RTCConfiguration(
-    {"iceServers": [{"urls": ["http://51.222.84.8:8501/"]}]}
+    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
 )
 
 class VideoProcessor:
