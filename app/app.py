@@ -3,6 +3,7 @@ from gtts import gTTS, lang
 from googletrans import Translator, LANGUAGES
 import cv2
 import numpy as np
+from streamlit_webrtc import webrtc_streamer
 
 # ---------------------------------------------------------------------------------------------------------------
 # Page configuration
@@ -160,40 +161,42 @@ def text_to_audio(texte, langue):
 
 st.write("### Record your sign language video:")
 
-col1, col2 = st.columns([1,1])
+webrtc_streamer(key="sample")
 
-with col1:
-    record_button_pressed = st.button("Record", key="record_button")
+# col1, col2 = st.columns([1,1])
 
-with col2:
-    stop_button_pressed = st.button("Stop", key="stop_button")
+# with col1:
+#     record_button_pressed = st.button("Record", key="record_button")
 
-if record_button_pressed:
+# with col2:
+#     stop_button_pressed = st.button("Stop", key="stop_button")
 
-    cap = cv2.VideoCapture(0)
-    frame_placeholder = st.empty()
+# if record_button_pressed:
 
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            st.write("Video Capture Ended")
-            break
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frame_placeholder.image(frame,channels="RGB")
-        if cv2.waitKey(1) & 0xFF == ord("q") or stop_button_pressed:
-            break
-    cap.release()
-    cv2.destroyAllWindows()
+#     cap = cv2.VideoCapture(0)
+#     frame_placeholder = st.empty()
 
-    # img_file_buffer = st.camera_input("Take a picture")
+#     while cap.isOpened():
+#         ret, frame = cap.read()
+#         if not ret:
+#             st.write("Video Capture Ended")
+#             break
+#         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#         frame_placeholder.image(frame,channels="RGB")
+#         if cv2.waitKey(1) & 0xFF == ord("q") or stop_button_pressed:
+#             break
+#     cap.release()
+#     cv2.destroyAllWindows()
 
-    # if img_file_buffer is not None:
-    #     bytes_data = img_file_buffer.getvalue()
-    #     cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+#     img_file_buffer = st.camera_input("Take a picture")
 
-    #     st.write(type(cv2_img))
+#     if img_file_buffer is not None:
+#         bytes_data = img_file_buffer.getvalue()
+#         cv2_img = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
 
-    #     st.write(cv2_img.shape)
+#         st.write(type(cv2_img))
+
+#         st.write(cv2_img.shape)
 
 st.write('<br>', unsafe_allow_html=True)
 
