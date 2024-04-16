@@ -189,7 +189,7 @@ st.write("### Record your sign language video:")
 #     async_processing=False,
 # )
 
-webrtc_streamer(key="example")
+webrtc_streamer(key="example", media_stream_constraints={"video": True, "audio": False})
 
 # col1, col2 = st.columns([1,1])
 
