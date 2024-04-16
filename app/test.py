@@ -10,6 +10,7 @@ import copy
 from gtts import gTTS, lang
 from googletrans import Translator, LANGUAGES
 from utils import CvFpsCalc
+from utils import main_model
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
 
@@ -491,6 +492,18 @@ def main():
     }
 
 # ---------------------------------------------------------------------------------------------------------------
+# Sidebar
+# ---------------------------------------------------------------------------------------------------------------
+    
+    st.sidebar.image("images/logo.png", width=250)
+    st.sidebar.title("SignLingo")
+
+    st.sidebar.divider()
+
+    if st.sidebar.button("Train Model", key="train_model", use_container_width=True):
+        st.session_state['model'] = main_model()
+
+# ---------------------------------------------------------------------------------------------------------------
 # Page content
 # ---------------------------------------------------------------------------------------------------------------
     st.write("### Record your sign language video:")
@@ -499,14 +512,19 @@ def main():
     frame_window = st.image([], channels="BGR", width=640)
 
     if run == True:
+# ---------------------------------------------------------------------------------------------------------------
+# Sign language recognition
+# ---------------------------------------------------------------------------------------------------------------
         cap_device = 0
         cap_width = 640
         cap_height = 480
 
+        # Camera preparation
         cap = cv.VideoCapture(cap_device)
         cap.set(cv.CAP_PROP_FRAME_WIDTH, cap_width)
         cap.set(cv.CAP_PROP_FRAME_HEIGHT, cap_height)
 
+        # Model load
         mp_hands = mp.solutions.hands
         use_static_image_mode = False
         min_detection_confidence = 0.5
@@ -521,15 +539,21 @@ def main():
         keypoint_classifier = KeyPointClassifier()
         point_history_classifier = PointHistoryClassifier()
 
+        # Load the label
         with open('model/keypoint_classifier/keypoint_classifier_label.csv', encoding='utf-8-sig') as f:
             keypoint_classifier_labels = [row[0] for row in csv.reader(f)]
 
         with open('model/point_history_classifier/point_history_classifier_label.csv', encoding='utf-8-sig') as f:
             point_history_classifier_labels = [row[0] for row in csv.reader(f)]
 
+        # FPS measurement
         cvFpsCalc = CvFpsCalc(buffer_len=10)
+
+        # Coordinate history
         history_length = 16
         point_history = deque(maxlen=history_length)
+
+        # Finger gesture history
         finger_gesture_history = deque(maxlen=history_length)
         mode = 0
         cvFpsCalc = CvFpsCalc(buffer_len=10)
@@ -538,12 +562,15 @@ def main():
 
         while run:
             fps = cvFpsCalc.get()
+
+            # Camera capture
             ret, image = cap.read()
             if not ret:
                 break
             image = cv.flip(image, 1)  # Mirror display
             debug_image = copy.deepcopy(image)
 
+            # Detection implementation
             image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
             image.flags.writeable = False
             results = hands.process(image)
@@ -551,21 +578,31 @@ def main():
 
             if results.multi_hand_landmarks is not None:
                 for hand_landmarks, handedness in zip(results.multi_hand_landmarks, results.multi_handedness):
+                    # Bound box calculation
                     brect = calc_bounding_rect(debug_image, hand_landmarks)
+                    # Landmark calculation
                     landmark_list = calc_landmark_list(debug_image, hand_landmarks)
+                    # Conversion to relative coordinates / normalized coordinates
                     pre_processed_landmark_list = pre_process_landmark(landmark_list)
                     pre_processed_point_history_list = pre_process_point_history(debug_image, point_history)
+
+                    # Hand sign classification
                     hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
-                    if hand_sign_id == 2:
+                    if hand_sign_id == 2: # Point gesture
                         point_history.append(landmark_list[8])
                     else:
                         point_history.append([0, 0])
+                    
+                    # Finger gesture classification
                     finger_gesture_id = 0
                     if len(pre_processed_point_history_list) == (history_length * 2):
                         finger_gesture_id = point_history_classifier(pre_processed_point_history_list)
+                    
+                    # Calculates the gesture IDs in the latest detection
                     finger_gesture_history.append(finger_gesture_id)
                     most_common_fg_id = Counter(finger_gesture_history).most_common()
 
+                    # Drawing part
                     debug_image = draw_bounding_rect(True, debug_image, brect)
                     debug_image = draw_landmarks(debug_image, landmark_list)
                     debug_image = draw_info_text(debug_image, brect, handedness,keypoint_classifier_labels[hand_sign_id],point_history_classifier_labels[most_common_fg_id[0][0]])
@@ -575,6 +612,7 @@ def main():
             else:
                 point_history.append([0, 0])
 
+            # Display part
             debug_image = draw_point_history(debug_image, point_history)
             debug_image = draw_info(debug_image, fps, mode, 0)
             frame_window.image(debug_image, channels="BGR")
@@ -586,6 +624,9 @@ def main():
         cap.release()  
 
     else:
+# ---------------------------------------------------------------------------------------------------------------
+# Text translation
+# ---------------------------------------------------------------------------------------------------------------
         st.write('<br>', unsafe_allow_html=True)
 
         # texte = st.text_input("Type your text here :", "How are you ?")
