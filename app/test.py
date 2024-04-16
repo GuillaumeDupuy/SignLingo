@@ -7,10 +7,11 @@ import csv
 import numpy as np
 from collections import deque, Counter
 import copy
+import pandas as pd
 from gtts import gTTS, lang
 from googletrans import Translator, LANGUAGES
 from utils import CvFpsCalc
-from utils import main_model
+from utils import main_model, main_model_history, record_video
 from model import KeyPointClassifier
 from model import PointHistoryClassifier
 
@@ -502,6 +503,26 @@ def main():
 
     if st.sidebar.button("Train Model", key="train_model", use_container_width=True):
         st.session_state['model'] = main_model()
+    
+    st.sidebar.divider()
+
+    if st.sidebar.button("Train Model History", key="train_model_history", use_container_width=True):
+        st.session_state['model_history'] = main_model_history()
+
+    st.sidebar.divider()
+
+    st.sidebar.write("### New label")
+
+    new_label = st.sidebar.text_input("Type your new label here :", "New label")
+
+    if st.sidebar.button("Add new label", key="add_new_label", use_container_width=True):
+        with open('model/keypoint_classifier/keypoint_classifier_label.csv', 'a', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow([new_label.capitalize()])
+
+        with open('model/point_history_classifier/point_history_classifier_label.csv', 'a', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow([new_label.capitalize()])    
 
 # ---------------------------------------------------------------------------------------------------------------
 # Page content
@@ -559,6 +580,7 @@ def main():
         cvFpsCalc = CvFpsCalc(buffer_len=10)
 
         stop_button = st.button('Stop', key="stop_button")
+        record_button = st.button('Record', key="record_button")
 
         while run:
             fps = cvFpsCalc.get()
@@ -586,6 +608,9 @@ def main():
                     pre_processed_landmark_list = pre_process_landmark(landmark_list)
                     pre_processed_point_history_list = pre_process_point_history(debug_image, point_history)
 
+                    # if record_button:
+                    #     record_video(pre_processed_landmark_list, pre_processed_point_history_list)
+
                     # Hand sign classification
                     hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
                     if hand_sign_id == 2: # Point gesture
@@ -607,7 +632,7 @@ def main():
                     debug_image = draw_landmarks(debug_image, landmark_list)
                     debug_image = draw_info_text(debug_image, brect, handedness,keypoint_classifier_labels[hand_sign_id],point_history_classifier_labels[most_common_fg_id[0][0]])
 
-                    st.write("Hand Gesture:", keypoint_classifier_labels[hand_sign_id])
+                    # st.write("Hand Gesture:", keypoint_classifier_labels[hand_sign_id])
                     st.session_state['hand_text'] = keypoint_classifier_labels[hand_sign_id]
             else:
                 point_history.append([0, 0])
@@ -629,7 +654,6 @@ def main():
 # ---------------------------------------------------------------------------------------------------------------
         st.write('<br>', unsafe_allow_html=True)
 
-        # texte = st.text_input("Type your text here :", "How are you ?")
         if st.session_state['hand_text'] == "":
             st.session_state['hand_text'] = "Waiting, with a word of hand"
 

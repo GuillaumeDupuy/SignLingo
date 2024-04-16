@@ -40,9 +40,9 @@ def train_model(model, X_train, y_train, X_test, y_test, model_save_path):
 
 def main_model():
     cwd = os.getcwd()
-    dataset_path = cwd + '/model/keypoint_classifier/keypoint.csv'
-    model_save_path = cwd + '/model/keypoint_classifier/keypoint_classifier.hdf5'
-    label = cwd + '/model/keypoint_classifier/keypoint_classifier_label.csv'
+    dataset_path = cwd + '/model/point_history_classifier/point_history.csv'
+    model_save_path = cwd + '/model/point_history_classifier/point_history_classifier.hdf5'
+    label = cwd + '/model/point_history_/point_history_label.csv'
     
     X_dataset, y_dataset = load_dataset(dataset_path)
     X_train, X_test, y_train, y_test = train_test_split(X_dataset, y_dataset, train_size=0.75, random_state=RANDOM_SEED)
