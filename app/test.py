@@ -374,9 +374,6 @@ def main():
         page_title="SignLingo", page_icon="👋", initial_sidebar_state="expanded"
     )
 
-    global hand_text
-    hand_text = "Waiting, with a word of hand"
-
 # ---------------------------------------------------------------------------------------------------------------
 # Page layout
 # ---------------------------------------------------------------------------------------------------------------
@@ -573,9 +570,8 @@ def main():
                     debug_image = draw_landmarks(debug_image, landmark_list)
                     debug_image = draw_info_text(debug_image, brect, handedness,keypoint_classifier_labels[hand_sign_id],point_history_classifier_labels[most_common_fg_id[0][0]])
 
-                    # st.write("Hand Gesture:", keypoint_classifier_labels[hand_sign_id])
-                    hand_text = keypoint_classifier_labels[hand_sign_id]
-
+                    st.write("Hand Gesture:", keypoint_classifier_labels[hand_sign_id])
+                    st.session_state['hand_text'] = keypoint_classifier_labels[hand_sign_id]
             else:
                 point_history.append([0, 0])
 
@@ -588,13 +584,15 @@ def main():
                 break
 
         cap.release()  
+
     else:
         st.write('<br>', unsafe_allow_html=True)
 
-        st.write("### Translate your text:")
-
         # texte = st.text_input("Type your text here :", "How are you ?")
-        texte = hand_text
+        if st.session_state['hand_text'] == "":
+            st.session_state['hand_text'] = "Waiting, with a word of hand"
+
+        texte = st.session_state['hand_text']
         texte = texte.lower()
 
         st.write("### Your text is : " + texte)
