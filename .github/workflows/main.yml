@@ -31,6 +31,6 @@ jobs:
               echo "Killing Streamlit process on port 8501"
               kill -9 $PID
             fi
-            nohup streamlit run app.py > /dev/null 2>&1 &
+            nohup streamlit run app.py --server.sslCertFile=server.crt --server.sslKeyFile=server.key > /dev/null 2>&1 &
 
             
