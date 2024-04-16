@@ -22,7 +22,7 @@ jobs:
           # active env python, va dans le dossier signlingo, checkout le code, pull le code, kill l'app et rerun l'app en fond de tache
           script: |
             source bin/activate
-            cd signlingo/SignLingo
+            cd SignLingo
             git checkout .
             git pull
             cd app
