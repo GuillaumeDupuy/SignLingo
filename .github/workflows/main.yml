@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-
+    paths-ignore:
+      - 'app/models/**'
 
 jobs:
   build_and_push:
@@ -32,4 +33,7 @@ jobs:
               kill -9 $PID
             fi
             python3 utils/train.py
+            git add .
+            git commit -m "Train new model"
+            git push
             nohup streamlit run app.py --server.sslCertFile=server.crt --server.sslKeyFile=server.key > /dev/null 2>&1 &
