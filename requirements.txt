@@ -1,6 +1,6 @@
 streamlit
 gtts 
-tensorflow
+tensorflow==2.16.1
 googletrans==4.0.0rc1
 opencv-python==4.7.0.68
 mediapipe==0.9.0.1
