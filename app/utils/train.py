@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 import pandas as pd
 import os
+import time
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, classification_report
@@ -33,14 +34,11 @@ def train_model(model, X_train, y_train, X_test, y_test, model_save_path):
     
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     model.fit(X_train, y_train, epochs=1000, batch_size=128, validation_data=(X_test, y_test), callbacks=[cp_callback, es_callback])
-    
-    model.save(model_save_path, include_optimizer=False)
 
-def main_model():
+def main_model(model_path, tflite_path):
     cwd = os.getcwd()
-    dataset_path = cwd + '/model/keypoint_classifier/keypoint.csv'
-    model_save_path = cwd + '/model/keypoint_classifier/keypoint_classifier.hdf5'
-    label = cwd + '/model/keypoint_classifier/keypoint_classifier_label.csv'
+    dataset_path = cwd + '/data/keypoint_classifier/keypoint.csv'
+    label = cwd + '/data/keypoint_classifier/keypoint_classifier_label.csv'
     
     X_dataset, y_dataset = load_dataset(dataset_path)
     X_train, X_test, y_train, y_test = train_test_split(X_dataset, y_dataset, train_size=0.75, random_state=RANDOM_SEED)
@@ -48,4 +46,29 @@ def main_model():
     df = pd.read_csv(label, header=None)
     NUM_CLASSES = len(df)
     model = create_model(21 * 2, NUM_CLASSES)
-    train_model(model, X_train, y_train, X_test, y_test, model_save_path)
+    train_model(model, X_train, y_train, X_test, y_test, model_path)
+
+    # convert the model to a TFLite model
+    converter = tf.lite.TFLiteConverter.from_keras_model(model)
+    converter.optimizations = [tf.lite.Optimize.DEFAULT]
+    tflite_model = converter.convert()
+
+    interpreter = tf.lite.Interpreter(model_path= cwd + f'/models/keypoint_classifier/{tflite_path}')
+    interpreter.allocate_tensors()
+    input_details = interpreter.get_input_details()
+    interpreter.set_tensor(input_details[0]['index'], np.array([X_test[0]]))
+    interpreter.invoke()
+
+    # get the current time
+    current_time = time.strftime('%d-%m-%Y_%H-%M')
+
+    # save the model to the model directory
+    model.save(f'{cwd}/models/keypoint_classifier/{current_time}_keypoint_classifier.hdf5')
+
+    # save the tflite model to the model directory
+    with open(f'{cwd}/models/keypoint_classifier/{current_time}_keypoint_classifier.tflite', 'wb') as f:
+        f.write(tflite_model)
+
+
+if __name__ == '__main__':
+    main_model('keypoint_classifier.hdf5', 'keypoint_classifier.tflite')

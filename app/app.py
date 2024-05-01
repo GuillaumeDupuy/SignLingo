@@ -12,10 +12,9 @@ import os
 import pandas as pd
 from gtts import gTTS, lang
 from googletrans import Translator, LANGUAGES
-from utils import CvFpsCalc
 from utils import main_model, main_model_history, record_video
-from model import KeyPointClassifier
-from model import PointHistoryClassifier
+from data import KeyPointClassifier
+from data import PointHistoryClassifier
 from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -493,8 +492,20 @@ def main():
 
     st.sidebar.divider()
 
+    model_directory = 'models/keypoint_classifier'
+    all_files = os.listdir(model_directory)
+
+    # Filtrer pour obtenir uniquement les fichiers .hdf5
+    models_hdf5 = [file for file in all_files if file.endswith('.hdf5') and os.path.isfile(os.path.join(model_directory, file))]
+
+    # Filtrer pour obtenir uniquement les fichiers .tflite
+    models_tflite = [file for file in all_files if file.endswith('.tflite') and os.path.isfile(os.path.join(model_directory, file))]
+
+    model_selected = st.sidebar.selectbox("Select the model to train :", models_hdf5)
+    tflite_selected = st.sidebar.selectbox("Select the TFLite model to train :", models_tflite)
+
     if st.sidebar.button("Train Model", key="train_model", use_container_width=True):
-        st.session_state['model'] = main_model()
+        st.session_state['model'] = main_model(model_selected, tflite_selected)
     
     st.sidebar.divider()
 
@@ -507,14 +518,13 @@ def main():
 
     new_label = st.sidebar.text_input("Type your new label here :", "New label")
 
+    check_label = False
+
     if st.sidebar.button("Add new label", key="add_new_label", use_container_width=True):
-        with open('model/keypoint_classifier/keypoint_classifier_label.csv', 'a', newline='') as f:
+        check_label = True
+        with open('data/keypoint_classifier/keypoint_classifier_label.csv', 'a', newline='') as f:
             writer = csv.writer(f)
             writer.writerow([new_label.capitalize()])
-
-        with open('model/point_history_classifier/point_history_classifier_label.csv', 'a', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow([new_label.capitalize()])    
 
 # ---------------------------------------------------------------------------------------------------------------
 # Page content
@@ -546,7 +556,7 @@ def main():
     point_history_classifier = PointHistoryClassifier()
 
     # Load the label
-    with open('model/keypoint_classifier/keypoint_classifier_label.csv', encoding='utf-8-sig') as f:
+    with open('data/keypoint_classifier/keypoint_classifier_label.csv', encoding='utf-8-sig') as f:
         keypoint_classifier_labels = [row[0] for row in csv.reader(f)]
 
     # Coordinate history
@@ -621,9 +631,6 @@ def main():
     with open('file.txt', 'r') as f:
         hand_text = f.readlines()[-1]
 
-    if os.path.exists('file.txt'):
-        os.remove('file.txt')
-
     texte = hand_text
     texte = texte.lower()
 
@@ -657,6 +664,9 @@ def main():
         st.audio(audio_bytes, format='audio/mp3')
     else:
         st.write("### Sorry, the selected language is not supported for text-to-speech.")
+
+    if os.path.exists('file.txt'):
+        os.remove('file.txt')
 
 if __name__ == "__main__":
     main()
