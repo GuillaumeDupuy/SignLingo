@@ -501,7 +501,7 @@ def main():
             datetime_str = '_'.join(datetime_part)  # Rejoindre pour former la partie datetime
             return datetime.strptime(datetime_str, '%d-%m-%Y_%H-%M')
         except Exception:
-            return None
+            return datetime.min  # Retourner une date minimale pour les fichiers sans datetime
 
     model_directory = 'models/keypoint_classifier'
     all_files = os.listdir(model_directory)
@@ -511,8 +511,7 @@ def main():
     for file in all_files:
         if file.endswith('.hdf5') and os.path.isfile(os.path.join(model_directory, file)):
             datetime_extracted = extract_datetime_from_filename(file)
-            if datetime_extracted:
-                models_hdf5.append((file, datetime_extracted))
+            models_hdf5.append((file, datetime_extracted))
 
     # Trier les fichiers .hdf5 par datetime extraite
     models_hdf5_sorted = sorted(models_hdf5, key=lambda x: x[1])
@@ -523,8 +522,7 @@ def main():
     for file in all_files:
         if file.endswith('.tflite') and os.path.isfile(os.path.join(model_directory, file)):
             datetime_extracted = extract_datetime_from_filename(file)
-            if datetime_extracted:
-                models_tflite.append((file, datetime_extracted))
+            models_tflite.append((file, datetime_extracted))
 
     # Trier les fichiers .tflite par datetime extraite
     models_tflite_sorted = sorted(models_tflite, key=lambda x: x[1])
