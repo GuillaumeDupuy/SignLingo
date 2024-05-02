@@ -17,18 +17,23 @@ jobs:
       - name: Check CSV file modification
         id: check_files
         run: |
-          CSV_FILE="SignLingo/app/data/keypoint_classifier/keypoint.csv"
-          git fetch --depth=1
-          LAST_COMMIT_TOUCHING_CSV=$(git log -1 --format="%at" -- $CSV_FILE)
-          CURRENT_TIME=$(date +%s)
-          TIME_SINCE_LAST_CHANGE=$(($CURRENT_TIME - $LAST_COMMIT_TOUCHING_CSV))
-          echo "Time since last commit affecting CSV: $TIME_SINCE_LAST_CHANGE seconds"
-          # Suppose here we consider any change since the last commit should trigger retraining
-          if [ $TIME_SINCE_LAST_CHANGE -gt 0 ]; then
-            echo "::set-output name=train_model::true"
-          else
-            echo "::set-output name=train_model::false"
-          fi
+            CSV_FILE="SignLingo/app/data/keypoint_classifier/keypoint.csv"
+            git fetch --depth=1
+            LAST_COMMIT_TOUCHING_CSV=$(git log -1 --format="%at" -- $CSV_FILE)
+            
+            if [ -z "$LAST_COMMIT_TOUCHING_CSV" ]; then
+            echo "No commits found affecting $CSV_FILE. Assuming new or untracked file."
+            echo "train_model=true" >> $GITHUB_ENV
+            else
+            CURRENT_TIME=$(date +%s)
+            TIME_SINCE_LAST_CHANGE=$(($CURRENT_TIME - $LAST_COMMIT_TOUCHING_CSV))
+            echo "Time since last commit affecting CSV: $TIME_SINCE_LAST_CHANGE seconds"
+            if [ $TIME_SINCE_LAST_CHANGE -gt 0 ]; then
+                echo "train_model=true" >> $GITHUB_ENV
+            else
+                echo "train_model=false" >> $GITHUB_ENV
+            fi
+            fi
 
   train:
     needs: check_data
