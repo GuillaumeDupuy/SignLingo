@@ -17,9 +17,6 @@ jobs:
       - name: Check CSV file modification
         id: check_files
         run: |
-          cd SignLingo
-          git checkout .
-          git pull
           CSV_FILE="app/data/keypoint.csv"
           git fetch --depth=1
           LAST_COMMIT_TOUCHING_CSV=$(git log -1 --format="%at" -- $CSV_FILE)
@@ -49,7 +46,10 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             source signlingo/bin/activate
-            cd SignLingo/app
+            cd SignLingo
+            git checkout .
+            git pull
+            cd app
             python3 utils/train.py
 
   build_app:
