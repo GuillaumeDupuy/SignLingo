@@ -53,7 +53,7 @@ jobs:
             python3 utils/train.py
 
   build_app:
-    needs: [check_data, train]
+    needs: check_data
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo
