@@ -377,6 +377,9 @@ def main():
     st.write('<br>', unsafe_allow_html=True)
     st.write("### SignLingo is a web app that translates sign language to text & speech.")
     st.write('#### Bridging Silence with Words and a World where Every Sign Counts')
+
+    st.title("Test")
+
     st.write('<br>', unsafe_allow_html=True)
 
     list_langues = {
