@@ -6,29 +6,70 @@ on:
       - main
 
 jobs:
-  build_and_push:
+  check_data:
+    runs-on: ubuntu-latest
+    outputs:
+      train_model: ${{ steps.check_files.outputs.train_model }}
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      
+      - name: Check CSV file modification
+        id: check_files
+        run: |
+          cd SignLingo
+          git checkout .
+          git pull
+          CSV_FILE="app/data/keypoint.csv"
+          git fetch --depth=1
+          LAST_COMMIT_TOUCHING_CSV=$(git log -1 --format="%at" -- $CSV_FILE)
+          CURRENT_TIME=$(date +%s)
+          TIME_SINCE_LAST_CHANGE=$(($CURRENT_TIME - $LAST_COMMIT_TOUCHING_CSV))
+          echo "Time since last commit affecting CSV: $TIME_SINCE_LAST_CHANGE seconds"
+          # Suppose here we consider any change since the last commit should trigger retraining
+          if [ $TIME_SINCE_LAST_CHANGE -gt 0 ]; then
+            echo "::set-output name=train_model::true"
+          else
+            echo "::set-output name=train_model::false"
+          fi
+
+  train:
+    needs: check_data
+    if: needs.check_data.outputs.train_model == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v2
       
+      - name: SSH and Train Model
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            source signlingo/bin/activate
+            cd SignLingo/app
+            python3 utils/train.py
+
+  build_app:
+    needs: [check_data, train]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+
       - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}
-          # active env python, va dans le dossier signlingo, checkout le code, pull le code, kill l'app et rerun l'app en fond de tache
           script: |
-            source signlingo/bin/activate
-            cd SignLingo
-            git checkout .
-            git pull
-            cd app
-            PID=$(lsof -ti:8501 )
+            cd SignLingo/app
+            PID=$(lsof -ti:8501)
             if [[ -n $PID ]]; then
               echo "Killing Streamlit process on port 8501"
               kill -9 $PID
             fi
-            python3 utils/train.py
             nohup streamlit run app.py --server.sslCertFile=server.crt --server.sslKeyFile=server.key > /dev/null 2>&1 &
