@@ -17,7 +17,7 @@ jobs:
       - name: Check CSV file modification
         id: check_files
         run: |
-          CSV_FILE="app/data/keypoint.csv"
+          CSV_FILE="SignLingo/app/data/keypoint_classifier/keypoint.csv"
           git fetch --depth=1
           LAST_COMMIT_TOUCHING_CSV=$(git log -1 --format="%at" -- $CSV_FILE)
           CURRENT_TIME=$(date +%s)
