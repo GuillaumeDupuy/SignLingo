@@ -9,6 +9,7 @@ from collections import deque, Counter
 import copy
 import av
 import os
+from datetime import datetime
 import pandas as pd
 from gtts import gTTS, lang
 from googletrans import Translator, LANGUAGES
@@ -492,20 +493,54 @@ def main():
 
     st.sidebar.divider()
 
+    def extract_datetime_from_filename(filename):
+        """Extrait la date et l'heure du nom de fichier, si possible."""
+        try:
+            base = os.path.splitext(filename)[0]  # Enlever l'extension
+            datetime_part = base.split('_')[:-1]  # Enlever la dernière partie après le dernier underscore
+            datetime_str = '_'.join(datetime_part)  # Rejoindre pour former la partie datetime
+            return datetime.strptime(datetime_str, '%d-%m-%Y_%H-%M')
+        except Exception:
+            return None
+
     model_directory = 'models/keypoint_classifier'
     all_files = os.listdir(model_directory)
 
+    # Filtrer pour obtenir uniquement les fichiers .hdf5 et extraire les datetimes
+    models_hdf5 = []
+    for file in all_files:
+        if file.endswith('.hdf5') and os.path.isfile(os.path.join(model_directory, file)):
+            datetime_extracted = extract_datetime_from_filename(file)
+            if datetime_extracted:
+                models_hdf5.append((file, datetime_extracted))
+
+    # Trier les fichiers .hdf5 par datetime extraite
+    models_hdf5_sorted = sorted(models_hdf5, key=lambda x: x[1])
+    models_hdf5_sorted = [model[0] for model in models_hdf5_sorted]  # Retirer la date de tri pour ne garder que les noms
+
+    # Filtrer pour obtenir uniquement les fichiers .tflite et extraire les datetimes
+    models_tflite = []
+    for file in all_files:
+        if file.endswith('.tflite') and os.path.isfile(os.path.join(model_directory, file)):
+            datetime_extracted = extract_datetime_from_filename(file)
+            if datetime_extracted:
+                models_tflite.append((file, datetime_extracted))
+
+    # Trier les fichiers .tflite par datetime extraite
+    models_tflite_sorted = sorted(models_tflite, key=lambda x: x[1])
+    models_tflite_sorted = [model[0] for model in models_tflite_sorted]  # Retirer la date de tri pour ne garder que les noms
+
     # Filtrer pour obtenir uniquement les fichiers .hdf5
-    models_hdf5 = [file for file in all_files if file.endswith('.hdf5') and os.path.isfile(os.path.join(model_directory, file))]
+    # models_hdf5 = [file for file in all_files if file.endswith('.hdf5') and os.path.isfile(os.path.join(model_directory, file))]
 
     # Trier les fichiers .hdf5 par date et heure dans le nom de fichier
-    models_hdf5_sorted = sorted(models_hdf5, key=lambda x: os.path.splitext(x)[0])
+    # models_hdf5_sorted = sorted(models_hdf5, key=lambda x: os.path.splitext(x)[0])
 
     # Filtrer pour obtenir uniquement les fichiers .tflite
-    models_tflite = [file for file in all_files if file.endswith('.tflite') and os.path.isfile(os.path.join(model_directory, file))]
+    # models_tflite = [file for file in all_files if file.endswith('.tflite') and os.path.isfile(os.path.join(model_directory, file))]
 
     # Trier les fichiers .tflite par date et heure dans le nom de fichier
-    models_tflite_sorted = sorted(models_tflite, key=lambda x: os.path.splitext(x)[0])
+    # models_tflite_sorted = sorted(models_tflite, key=lambda x: os.path.splitext(x)[0])
 
     model_selected = st.sidebar.selectbox("Select the model to train :", models_hdf5_sorted)
     tflite_selected = st.sidebar.selectbox("Select the TFLite model to train :", models_tflite_sorted)
