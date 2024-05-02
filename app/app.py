@@ -498,11 +498,17 @@ def main():
     # Filtrer pour obtenir uniquement les fichiers .hdf5
     models_hdf5 = [file for file in all_files if file.endswith('.hdf5') and os.path.isfile(os.path.join(model_directory, file))]
 
+    # Trier les fichiers .hdf5 par date et heure dans le nom de fichier
+    models_hdf5_sorted = sorted(models_hdf5, key=lambda x: os.path.splitext(x)[0])
+
     # Filtrer pour obtenir uniquement les fichiers .tflite
     models_tflite = [file for file in all_files if file.endswith('.tflite') and os.path.isfile(os.path.join(model_directory, file))]
 
-    model_selected = st.sidebar.selectbox("Select the model to train :", models_hdf5)
-    tflite_selected = st.sidebar.selectbox("Select the TFLite model to train :", models_tflite)
+    # Trier les fichiers .tflite par date et heure dans le nom de fichier
+    models_tflite_sorted = sorted(models_tflite, key=lambda x: os.path.splitext(x)[0])
+
+    model_selected = st.sidebar.selectbox("Select the model to train :", models_hdf5_sorted)
+    tflite_selected = st.sidebar.selectbox("Select the TFLite model to train :", models_tflite_sorted)
 
     if st.sidebar.button("Train Model", key="train_model", use_container_width=True):
         st.session_state['model'] = main_model(model_selected, tflite_selected)
