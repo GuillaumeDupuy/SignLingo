@@ -10,13 +10,13 @@ jobs:
   check_data:
     runs-on: ubuntu-latest
     outputs:
-      train_model: ${{ steps.check_files.outputs.train_model }}
+      train_model: ${{ steps.check_data.outputs.train_model }}
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v2
 
       - name: Check CSV file on VPS
-        id: check_files
+        id: check_data
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_IP }}
