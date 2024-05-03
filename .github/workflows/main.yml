@@ -19,24 +19,15 @@ jobs:
         id: check_files
         run: |
             CSV_FILE="app/data/keypoint_classifier/keypoint.csv"
-            git fetch
-            LAST_COMMIT_TOUCHING_CSV=$(git log -1 --format="%at" -- $CSV_FILE)
+            git fetch --depth=2
+            git diff HEAD^ HEAD --name-only | grep "$CSV_FILE" > /dev/null
+            MODIFIED=$?
             
-            if [ -z "$LAST_COMMIT_TOUCHING_CSV" ]; then
-              echo "No recent commits affecting $CSV_FILE found."
-              exit 1
-            fi
-            
-            CURRENT_TIME=$(date +%s)
-            TIME_SINCE_LAST_CHANGE=$((CURRENT_TIME - LAST_COMMIT_TOUCHING_CSV))
-            
-            echo "Time since last commit affecting CSV: $TIME_SINCE_LAST_CHANGE seconds"
-            
-            if [ $TIME_SINCE_LAST_CHANGE -gt 0 ]; then
-              echo "Training model required."
+            if [ $MODIFIED -eq 0 ]; then
+              echo "Training model required because $CSV_FILE was modified."
               echo "::set-output name=train_model::true"
             else
-              echo "No training required."
+              echo "No training required as $CSV_FILE was not modified."
               echo "::set-output name=train_model::false"
             fi
 
