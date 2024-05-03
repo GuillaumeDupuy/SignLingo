@@ -24,6 +24,8 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd SignLingo
+            git checkout .
+            git pull
             FILE_DATE=$(stat -c %Y "app/data/keypoint_classifier/keypoint.csv")
             CURRENT_DATE=$(date +%s)
             let "DIFF = CURRENT_DATE - FILE_DATE"
