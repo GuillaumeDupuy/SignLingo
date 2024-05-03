@@ -26,7 +26,7 @@ jobs:
             cd SignLingo
             git fetch
             CHANGES=$(git diff --name-only origin/main)
-            if [ echo "$CHANGES" | grep -q "app/data/keypoint_classifier/keypoint.csv"]; then
+            if echo "$CHANGES" | grep -q "app/data/keypoint_classifier/keypoint.csv"; then
               echo "Training model required because CSV file was modified."
               echo "::set-output name=train_model::true"
             else
