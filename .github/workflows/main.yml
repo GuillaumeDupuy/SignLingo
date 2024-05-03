@@ -14,12 +14,13 @@ jobs:
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
       
       - name: Check CSV file modification
         id: check_files
         run: |
             CSV_FILE="app/data/keypoint_classifier/keypoint.csv"
-            git fetch --depth=2
             git diff HEAD^ HEAD --name-only | grep "$CSV_FILE" > /dev/null
             MODIFIED=$?
             
@@ -29,7 +30,6 @@ jobs:
             else
               echo "No training required as $CSV_FILE was not modified."
               echo "::set-output name=train_model::false"
-            fi
 
 # Train model with new data
   train:
