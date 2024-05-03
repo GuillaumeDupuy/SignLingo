@@ -33,8 +33,10 @@ jobs:
             
             if [ $TIME_SINCE_LAST_CHANGE -gt 0 ]; then
               echo "Training model required."
+              echo "::set-output name=train_model::true"
             else
               echo "No training required."
+              echo "::set-output name=train_model::false"
             fi
 
   train:
