@@ -30,7 +30,8 @@ jobs:
             else
               echo "No training required as $CSV_FILE was not modified."
               echo "::set-output name=train_model::false"
-
+            fi
+            
 # Train model with new data
   train:
     needs: check_data
