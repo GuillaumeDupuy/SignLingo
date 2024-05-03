@@ -37,7 +37,7 @@ jobs:
 # Train model with new data
   train:
     needs: check_data
-    if: needs.check_data.outputs.train_model == 'true'
+    if: "${{ needs.check_data.outputs.train_model == 'true' }}"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo
