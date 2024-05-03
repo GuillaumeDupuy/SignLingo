@@ -6,6 +6,7 @@ on:
       - main
 
 jobs:
+# Check if CSV file has been modified
   check_data:
     runs-on: ubuntu-latest
     outputs:
@@ -39,6 +40,7 @@ jobs:
               echo "::set-output name=train_model::false"
             fi
 
+# Train model with new data
   train:
     needs: check_data
     if: needs.check_data.outputs.train_model == 'true'
@@ -61,6 +63,7 @@ jobs:
             cd app
             python3 utils/train.py
 
+# Build and deploy app
   build_app:
     needs: check_data
     runs-on: ubuntu-latest
