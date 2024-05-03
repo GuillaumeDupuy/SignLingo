@@ -10,28 +10,32 @@ jobs:
   check_data:
     runs-on: ubuntu-latest
     outputs:
-      train_model: ${{ steps.check_files.outputs.train_model }}
+      train_model: ${{ steps.check_modified.outputs.train_model }}
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v2
+
+      - name: Check CSV file on VPS
+        id: check_modified
+        uses: appleboy/ssh-action@master
         with:
-          fetch-depth: 2
-      
-      - name: Check CSV file modification
-        id: check_files
-        run: |
-            CSV_FILE="app/data/keypoint_classifier/keypoint.csv"
-            git diff HEAD --name-only | grep "$CSV_FILE" > /dev/null
-            MODIFIED=$?
-            
-            if [ $MODIFIED -eq 0 ]; then
-              echo "Training model required because $CSV_FILE was modified."
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            cd SignLingo
+            FILE_DATE=$(stat -c %Y "app/data/keypoint_classifier/keypoint.csv")
+            CURRENT_DATE=$(date +%s)
+            let "DIFF = CURRENT_DATE - FILE_DATE"
+            # Set time threshold for "recent" to 24 hours (86400 seconds)
+            if [ $DIFF -lt 86400 ]; then
+              echo "Training model required because CSV file was modified recently."
               echo "::set-output name=train_model::true"
             else
-              echo "No training required as $CSV_FILE was not modified."
+              echo "No training required as CSV file was not modified recently."
               echo "::set-output name=train_model::false"
             fi
-            
+
 # Train model with new data
   train:
     needs: check_data
