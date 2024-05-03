@@ -21,7 +21,7 @@ jobs:
         id: check_files
         run: |
             CSV_FILE="app/data/keypoint_classifier/keypoint.csv"
-            git diff HEAD^ HEAD --name-only | grep "$CSV_FILE" > /dev/null
+            git diff HEAD --name-only | grep "$CSV_FILE" > /dev/null
             MODIFIED=$?
             
             if [ $MODIFIED -eq 0 ]; then
