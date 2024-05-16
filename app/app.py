@@ -554,17 +554,17 @@ def main():
 
     st.sidebar.divider()
 
-    st.sidebar.write("### New label")
+    # st.sidebar.write("### New label")
 
-    new_label = st.sidebar.text_input("Type your new label here :", "New label")
+    # new_label = st.sidebar.text_input("Type your new label here :", "New label")
 
-    check_label = False
+    # check_label = False
 
-    if st.sidebar.button("Add new label", key="add_new_label", use_container_width=True):
-        check_label = True
-        with open('data/keypoint_classifier/keypoint_classifier_label.csv', 'a', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow([new_label.capitalize()])
+    # if st.sidebar.button("Add new label", key="add_new_label", use_container_width=True):
+    #     check_label = True
+    #     with open('data/keypoint_classifier/keypoint_classifier_label.csv', 'a', newline='') as f:
+    #         writer = csv.writer(f)
+    #         writer.writerow([new_label.capitalize()])
 
 # ---------------------------------------------------------------------------------------------------------------
 # Page content
@@ -704,9 +704,6 @@ def main():
         st.audio(audio_bytes, format='audio/mp3')
     else:
         st.write("### Sorry, the selected language is not supported for text-to-speech.")
-
-    if os.path.exists('file.txt'):
-        os.remove('file.txt')
 
 if __name__ == "__main__":
     main()
