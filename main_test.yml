@@ -1,0 +1,34 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          # active env python, va dans le dossier signlingo, checkout le code, pull le code, kill l'app et rerun l'app en fond de tache
+          script: |
+            source signlingo/bin/activate
+            cd SignLingo
+            git checkout .
+            git pull
+            cd app
+            PID=$(lsof -ti:8501 )
+            if [[ -n $PID ]]; then
+              echo "Killing Streamlit process on port 8501"
+              kill -9 $PID
+            fi
+            python3 utils/train.py
+            nohup streamlit run app.py --server.sslCertFile=server.crt --server.sslKeyFile=server.key > /dev/null 2>&1 &
