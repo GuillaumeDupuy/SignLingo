@@ -65,13 +65,14 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v2
 
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1.0.3
+      # - name: Deploy to VPS
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
-          password: ${{ secrets.VPS_PASSWORD }}
-          script: echo "Deploying to VPS..."
+          key: ${{ secrets.VPS_KEY }}
+          script: whoami
         # with:
         #   host: ${{ secrets.VPS_IP }}
         #   username: ${{ secrets.VPS_USER }}
