@@ -65,7 +65,7 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v2
 
-      - name: Deploy to VPS
+      - name: Deploy toVPS
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_IP }}
