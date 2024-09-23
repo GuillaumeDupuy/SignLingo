@@ -6,60 +6,60 @@ on:
       - main
 
 jobs:
-# # Check if CSV file has been modified
-#   check_data:
-#     runs-on: ubuntu-latest
-#     outputs:
-#       train_model: ${{ steps.check_data.outputs.train_model }}
-#     steps:
-#       - name: Checkout the repo
-#         uses: actions/checkout@v2
+# Check if CSV file has been modified
+  check_data:
+    runs-on: ubuntu-latest
+    outputs:
+      train_model: ${{ steps.check_data.outputs.train_model }}
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
 
-#       - name: Check CSV file on VPS
-#         id: check_data
-#         uses: appleboy/ssh-action@master
-#         with:
-#           host: ${{ secrets.VPS_IP }}
-#           username: ${{ secrets.VPS_USER }}
-#           password: ${{ secrets.VPS_PASSWORD }}
-#           script: |
-#             cd SignLingo
-#             git fetch
-#             CHANGES=$(git diff --name-only origin/main)
-#             if echo "$CHANGES" | grep -q "app/data/keypoint_classifier/keypoint.csv"; then
-#               echo "Training model required because CSV file was modified."
-#               echo "::set-output name=train_model::true"
-#             else
-#               echo "No training required as CSV file was not modified."
-#               echo "::set-output name=train_model::false"
-#             fi
+      - name: Check CSV file on VPS
+        id: check_data
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd SignLingo
+            git fetch
+            CHANGES=$(git diff --name-only origin/main)
+            if echo "$CHANGES" | grep -q "app/data/keypoint_classifier/keypoint.csv"; then
+              echo "Training model required because CSV file was modified."
+              echo "::set-output name=train_model::true"
+            else
+              echo "No training required as CSV file was not modified."
+              echo "::set-output name=train_model::false"
+            fi
 
-# # Train model with new data
-#   train:
-#     needs: check_data
-#     if: needs.check_data.outputs.train_model == 'true'
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout the repo
-#         uses: actions/checkout@v2
+# Train model with new data
+  train:
+    needs: check_data
+    if: needs.check_data.outputs.train_model == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
       
-#       - name: SSH and Train Model
-#         uses: appleboy/ssh-action@master
-#         with:
-#           host: ${{ secrets.VPS_IP }}
-#           username: ${{ secrets.VPS_USER }}
-#           password: ${{ secrets.VPS_PASSWORD }}
-#           script: |
-#             source signlingo/bin/activate
-#             cd SignLingo
-#             git checkout .
-#             git pull
-#             cd app
-#             python3 utils/train.py
+      - name: SSH and Train Model
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            source signlingo/bin/activate
+            cd SignLingo
+            git checkout .
+            git pull
+            cd app
+            python3 utils/train.py
 
 # Build and deploy app
   build_app:
-    # needs: check_data
+    needs: check_data
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repo
