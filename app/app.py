@@ -12,7 +12,8 @@ import os
 from datetime import datetime
 import pandas as pd
 from gtts import gTTS, lang
-from googletrans import Translator, LANGUAGES
+from deep_translator import GoogleTranslator
+from langdetect import detect
 from utils import main_model, main_model_history, record_video
 from data import KeyPointClassifier
 from data import PointHistoryClassifier
@@ -342,17 +343,15 @@ def detect_lang(texte):
     """
     Detect the language of the text
     """
-    detect = Translator()
-    detect_lang = detect.detect(texte)
-    return detect_lang.lang
+    detect_lang = detect(texte)
+    return detect_lang
 
 def translate_text(texte, langue_cible):
     """
     Translate the text to the target language
     """
-    translator = Translator()
-    traduction = translator.translate(texte, dest=langue_cible)
-    return traduction.text
+    traduction = GoogleTranslator(source='auto', target=langue_cible).translate(texte)
+    return traduction
 
 def text_to_audio(texte, langue):
     """

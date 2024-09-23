@@ -1,10 +1,11 @@
 import streamlit as st
 from gtts import gTTS, lang
-from googletrans import Translator, LANGUAGES
+from deep_translator import GoogleTranslator
 import cv2
 import numpy as np
 from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
 from PIL import Image
+from langdetect import detect
 
 # ---------------------------------------------------------------------------------------------------------------
 # Page configuration
@@ -137,17 +138,15 @@ def detect_lang(texte):
     """
     Detect the language of the text
     """
-    detect = Translator()
-    detect_lang = detect.detect(texte)
-    return detect_lang.lang
+    detect_lang = detect(texte)
+    return detect_lang
 
 def translate_text(texte, langue_cible):
     """
     Translate the text to the target language
     """
-    translator = Translator()
-    traduction = translator.translate(texte, dest=langue_cible)
-    return traduction.text
+    traduction = GoogleTranslator(source='auto', target=langue_cible).translate(texte)
+    return traduction
 
 def text_to_audio(texte, langue):
     """
@@ -235,7 +234,7 @@ texte = texte.lower()
 
 lang_detect = detect_lang(texte)
 # Recover the language name from the language code
-langue_detect = list_langues[lang_detect]
+langue_detect = list_langues.get(lang_detect, 'Unknown language')
 
 st.write("### Your text is in ")
 st.write(langue_detect)
