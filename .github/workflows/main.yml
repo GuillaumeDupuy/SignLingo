@@ -65,13 +65,13 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v2
 
-      # - name: Deploy to VPS
-      - name: Deploy to server via SSH
+      - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
-          password: ${{ secrets.VPS_PASSWORD }}
+          # password: ${{ secrets.VPS_PASSWORD }}
+          key: ${{ secrets.VPS_KEY }}
           script: |
             source signlingo/bin/activate
             cd SignLingo
