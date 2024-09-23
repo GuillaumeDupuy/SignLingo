@@ -71,7 +71,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           # password: ${{ secrets.SSH_PASSWORD }}
-          key: ${{ secrets.VPS_KEY }}
+          key: ${{ secrets.SSH_KEY }}
           script: |
             source signlingo/bin/activate
             cd SignLingo
