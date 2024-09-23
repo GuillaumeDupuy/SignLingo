@@ -70,8 +70,8 @@ jobs:
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
-          password: ${{ secrets.VPS_PASSWORD }}
-          # key: ${{ secrets.VPS_KEY }}
+          # password: ${{ secrets.VPS_PASSWORD }}
+          key: ${{ secrets.VPS_KEY }}
           script: |
             source signlingo/bin/activate
             cd SignLingo
