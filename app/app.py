@@ -8,6 +8,7 @@ import numpy as np
 from collections import deque, Counter
 import copy
 import av
+import json
 import os
 from datetime import datetime
 import pandas as pd
@@ -379,111 +380,8 @@ def main():
 
     st.write('<br>', unsafe_allow_html=True)
 
-    list_langues = {
-        'af': 'afrikaans',
-        'sq': 'albanian',
-        'am': 'amharic',
-        'ar': 'arabic',
-        'hy': 'armenian',
-        'az': 'azerbaijani',
-        'be': 'belarusian',
-        'bn': 'bengali',
-        'bs': 'bosnian',
-        'bg': 'bulgarian',
-        'ca': 'catalan',
-        'ceb': 'cebuano',
-        'ny': 'chichewa',
-        'zh-cn': 'chinese (simplified)',
-        'zh-tw': 'chinese (traditional)',
-        'hr': 'croatian',
-        'cs': 'czech',
-        'da': 'danish',
-        'nl': 'dutch',
-        'en': 'english',
-        'eo': 'esperanto',
-        'et': 'estonian',
-        'tl': 'filipino',
-        'fi': 'finnish',
-        'fr': 'french',
-        'fy': 'frisian',
-        'gl': 'galician',
-        'ka': 'georgian',
-        'de': 'german',
-        'el': 'greek',
-        'gu': 'gujarati',
-        'ht': 'haitian creole',
-        'ha': 'hausa',
-        'haw': 'hawaiian',
-        'iw': 'hebrew',
-        'hi': 'hindi',
-        'hmn': 'hmong',
-        'hu': 'hungarian',
-        'is': 'icelandic',
-        'ig': 'igbo',
-        'id': 'indonesian',
-        'ga': 'irish',
-        'it': 'italian',
-        'ja': 'japanese',
-        'jw': 'javanese',
-        'kn': 'kannada',
-        'kk': 'kazakh',
-        'km': 'khmer',
-        'ko': 'korean',
-        'ku': 'kurdish (kurmanji)',
-        'ky': 'kyrgyz',
-        'lo': 'lao',
-        'la': 'latin',
-        'lv': 'latvian',
-        'lt': 'lithuanian',
-        'lb': 'luxembourgish',
-        'mk': 'macedonian',
-        'mg': 'malagasy',
-        'ms': 'malay',
-        'ml': 'malayalam',
-        'mt': 'maltese',
-        'mi': 'maori',
-        'mr': 'marathi',
-        'mn': 'mongolian',
-        'my': 'myanmar (burmese)',
-        'ne': 'nepali',
-        'no': 'norwegian',
-        'ps': 'pashto',
-        'fa': 'persian',
-        'pl': 'polish',
-        'pt': 'portuguese',
-        'pa': 'punjabi',
-        'ro': 'romanian',
-        'ru': 'russian',
-        'sm': 'samoan',
-        'gd': 'scots gaelic',
-        'sr': 'serbian',
-        'st': 'sesotho',
-        'sn': 'shona',
-        'sd': 'sindhi',
-        'si': 'sinhala',
-        'sk': 'slovak',
-        'sl': 'slovenian',
-        'so': 'somali',
-        'es': 'spanish',
-        'su': 'sundanese',
-        'sw': 'swahili',
-        'sv': 'swedish',
-        'tg': 'tajik',
-        'ta': 'tamil',
-        'te': 'telugu',
-        'th': 'thai',
-        'tr': 'turkish',
-        'uk': 'ukrainian',
-        'ur': 'urdu',
-        'ug': 'uyghur',
-        'uz': 'uzbek',
-        'vi': 'vietnamese',
-        'cy': 'welsh',
-        'xh': 'xhosa',
-        'yi': 'yiddish',
-        'yo': 'yoruba',
-        'zu': 'zulu',
-    }
+    with open("json/lang.json", "r", encoding="utf-8") as f:
+        list_langues = json.load(f)
 
 # ---------------------------------------------------------------------------------------------------------------
 # Sidebar
@@ -675,11 +573,12 @@ def main():
 
     st.write("### Your text is : " + texte)
 
-    lang_detect = detect_lang(texte)
-    # Recover the language name from the language code
-    langue_detect = list_langues[lang_detect]
+    # lang_detect = detect_lang(texte)
+    # # Recover the language name from the language code
+    # langue_detect = list_langues[lang_detect]
 
-    st.write("### Your text is in " + langue_detect)
+    # st.write("### Your text is in " + langue_detect)
+    st.write("### Your text is in english")
 
     # Select the language to translate to (default: french)
     st.write('<br>', unsafe_allow_html=True)
