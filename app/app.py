@@ -545,8 +545,19 @@ def main():
                 debug_image = draw_landmarks(debug_image, landmark_list)
                 debug_image = draw_info_text(debug_image, brect, handedness, keypoint_classifier_labels[hand_sign_id], str(most_common_fg_id[0][0]))
 
-                with open('file.txt', 'w') as f:
-                    f.write(keypoint_classifier_labels[hand_sign_id])
+                try:
+                    with open('file.txt', 'r') as f:
+                        lines = f.readlines()
+                        if lines:
+                            hand_text = lines[-1].strip()
+                        else:
+                            hand_text = ""
+                except FileNotFoundError:
+                    hand_text = ""
+
+                if keypoint_classifier_labels[hand_sign_id] != hand_text:
+                    with open('file.txt', 'a') as f:
+                        f.write(keypoint_classifier_labels[hand_sign_id] + '\n')
         else:
             point_history.append([0, 0])
 
@@ -565,11 +576,23 @@ def main():
 # ---------------------------------------------------------------------------------------------------------------
     st.write('<br>', unsafe_allow_html=True)
 
-    with open('file.txt', 'r') as f:
-        hand_text = f.readlines()[-1]
+    try:
+        with open('file.txt', 'r') as f:
+            words = f.readlines()
 
-    texte = hand_text
-    texte = texte.lower()
+        words = [word.strip() for word in words]
+
+        if words == ["No sign detected"]:
+            phrase = "No sign detected"
+        else:
+            words = [word for word in words if word != "No sign detected"]
+            phrase = ' '.join(words)
+
+    except FileNotFoundError:
+        phrase = ""
+
+
+    texte = phrase.lower()
 
     st.write("### Your text is : " + texte)
 
