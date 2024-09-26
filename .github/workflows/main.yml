@@ -47,9 +47,9 @@ jobs:
       - name: SSH and Train Model
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_IP }}
-          username: ${{ secrets.SSH_USER }}
-          # key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          # key: ${{ secrets.VPS_KEY }}
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             source signlingo/bin/activate
@@ -70,9 +70,9 @@ jobs:
       - name: Deploy to VPS V2
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_IP }}
-          username: ${{ secrets.SSH_USER }}
-          # key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          # key: ${{ secrets.VPS_KEY }}
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             source signlingo/bin/activate
